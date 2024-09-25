@@ -56,19 +56,19 @@ public class GroceryDAO {
      *
      * @param groceryName the name of the grocery passed in from the GroceryService.
      */
-    public void addGrocery(String groceryName){
+    public void addGrocery(String groceryName) {
         Connection connection = ConnectionUtil.getConnection();
         try {
-            //Write SQL logic here
-            String sql = "INSERT INTO Grocery (grocery_name) VALUES (?)";
-            PreparedStatement ps = connection.prepareStatement(sql);
-
-            //add code that leverages ps.setString here
-
-            ps.executeUpdate();
-        }catch(SQLException e){
-            e.printStackTrace();
+            String sql = "INSERT INTO Grocery (grocery_name) VALUES (?)"; 
+            PreparedStatement ps = connection.prepareStatement(sql); 
+    
+            ps.setString(1, groceryName); 
+            ps.executeUpdate(); 
+    
+        } catch (SQLException e) {
+            e.printStackTrace(); // Printing any SQL exceptions to the console for debugging
+        } finally {
+            if (connection != null) try { connection.close(); } catch (SQLException ignore) {} // Properly closing the connection
         }
     }
-
-}
+    
