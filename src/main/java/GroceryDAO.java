@@ -17,58 +17,57 @@ import java.util.List;
  */
 public class GroceryDAO {
 
+    
+    private static Connection connection = null;
+
+    static {
+        connection = ConnectionUtil.getConnection();
+    }
 
     /**
-     * TODO: Select all of the rows of the Grocery table.
-     * You only need to change the sql String, the rest of the method is already complete.
+     * Select all of the rows of the grocery table.
      * @return a List of all the groceries contained within the database.
      */
-    public List<String> getAllGroceries(){
-        Connection connection = ConnectionUtil.getConnection();
+    public List<String> getAllGroceries() {
         List<String> groceries = new ArrayList<>();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         try {
-            //Write SQL logic here
-            String sql = "SELECT grocery_name FROM Grocery";
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
-            while(rs.next()){
+            String sql = "SELECT grocery_name FROM grocery";
+            ps = connection.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
                 groceries.add(rs.getString("grocery_name"));
             }
-        }catch(SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (rs != null) try { rs.close(); } catch (SQLException ignore) {}
+            if (ps != null) try { ps.close(); } catch (SQLException ignore) {}
         }
         return groceries;
     }
+
     /**
-     * TODO: Insert a new row into the Grocery table, which contains a column named grocery_name.
-     * A parameter groceryName is also provided, which should be the value used for grocery_name when inserting a
-     * grocery. For instance, calling groceryDAO.addGrocery("bread"); should insert a record into the grocery table
-     * with the value 'bread' for the grocery_name column.
-     *
-     * You should use the preparedStatement syntax for filling in unknown parameters with a '?'.
-     * For instance, an insert statement would be written as:
-     * String sql = "INSERT INTO TABLE (Column1, Column2) VALUES (?, ?)"
-     * The question marks can be filled in by the methods setString, setInt, etc of the PreparedStatement. They follow
-     * this format, where the first argument identifies the question mark to be filled (left to right, starting
-     * from one) and the second argument identifies the variable to be used:
-     * preparedStatement.setString(1,int1);
-     * preparedStatement.setInt(2,string2);
-     *
+     * Insert a new row into the grocery table.
      * @param groceryName the name of the grocery passed in from the GroceryService.
      */
     public void addGrocery(String groceryName) {
-        Connection connection = ConnectionUtil.getConnection();
+        PreparedStatement ps = null;
         try {
-            String sql = "INSERT INTO Grocery (grocery_name) VALUES (?)"; 
-            PreparedStatement ps = connection.prepareStatement(sql); 
-    
-            ps.setString(1, groceryName); 
-            ps.executeUpdate(); 
-    
+            String sql = "INSERT INTO grocery (grocery_name) VALUES (?)";
+            ps = connection.prepareStatement(sql);
+
+            ps.setString(1, groceryName);
+            ps.executeUpdate();
+
+
         } catch (SQLException e) {
-            e.printStackTrace(); // Printing any SQL exceptions to the console for debugging
+            e.printStackTrace();
+            
         } finally {
-            if (connection != null) try { connection.close(); } catch (SQLException ignore) {} // Properly closing the connection
+            // Close resources but not the connection
+            if (ps != null) try { ps.close(); } catch (SQLException ignore) {}
         }
     }
-    
+}
